@@ -44,17 +44,48 @@ lkw workflow trigger <id> --key $LKW_API_KEY --file payload.json --json
 
 ## Commands
 
+### Auth
 | Command | What it does |
 | :--- | :--- |
 | `lkw auth login [--api <url>] [--email <e>] [--password <p>] [--profile <name>]` | Authenticate; stores token in `~/.lkw/config.json` |
 | `lkw auth logout` | Revoke the active session and clear the local token |
 | `lkw whoami` | Show the active profile and authenticated user |
+
+### Client / profile
+| Command | What it does |
+| :--- | :--- |
 | `lkw client init <name>` | Create org + admin user + starter project; prints credentials |
+| `lkw client doctor` | Diagnose config / connectivity / auth (use when "it's broken") |
+| `lkw client switch [profile]` | List / switch / `--add` profiles in `~/.lkw/config.json` |
+
+### Project
+| Command | What it does |
+| :--- | :--- |
 | `lkw project list [--json]` | List projects accessible to the active user |
+
+### Workflows
+| Command | What it does |
+| :--- | :--- |
 | `lkw workflow list <projectId> [--json]` | List workflows in a project |
 | `lkw workflow export <id> [-o file]` | Dump workflow as JSON (stdout by default) |
 | `lkw workflow import <projectId> <file> [--name <n>]` | Create a workflow from an exported JSON file |
-| `lkw workflow trigger <id> --key <apiKey> [--data \|  --file] [--json]` | Fire a workflow via its public HTTP endpoint |
+| `lkw workflow validate <file> [--strict]` | Static check: trigger, dead nodes, missing config, dangling edges (offline) |
+| `lkw workflow diff <id> <file>` | Compare local JSON vs prod (added/removed/modified nodes) |
+| `lkw workflow trigger <id> --key <apiKey> [--data \| --file] [--json]` | Fire a workflow via its public HTTP endpoint |
+| `lkw workflow watch <executionId>` | Stream execution logs live (tail -f style) |
+| `lkw workflow logs <executionId> [--json]` | Fetch all logs of a finished execution |
+| `lkw workflow dev <file> <workflowId> --key <k> [--payload <f>]` | Hot-reload: watch JSON, auto-PUT on change, optionally trigger + tail logs |
+
+### Templates
+| Command | What it does |
+| :--- | :--- |
+| `lkw template list [--json]` | List workflow templates |
+| `lkw template use <templateId> <projectId> [--name <n>]` | Clone a template into a project as a DRAFT |
+
+### Mocks
+| Command | What it does |
+| :--- | :--- |
+| `lkw mocks ping [client] [--base <url>]` | Ping `lkw-mocks.vercel.app` /health and probe a known client endpoint |
 
 Help on any command: `lkw <cmd> --help`.
 
