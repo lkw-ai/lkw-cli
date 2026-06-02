@@ -4,6 +4,7 @@
  */
 import chalk from 'chalk';
 import ora, { type Ora } from 'ora';
+import prompts from 'prompts';
 
 export const colors = {
   success: chalk.green,
@@ -18,15 +19,23 @@ export const symbols = {
   success: chalk.green('✔'),
   warn: chalk.yellow('!'),
   error: chalk.red('✗'),
+  info: chalk.cyan('ℹ'),
 };
 
 export function spinner(text: string): Ora {
   return ora({ text, color: 'cyan' });
 }
 
-export function die(message: string, status = 1): never {
+/**
+ * Centralized exit. Optionally adds a helpful hint after the error.
+ * Examples:
+ *   die('CEP inválido', { hint: 'must be 8 digits' })
+ *   die('cannot reach API', { hint: 'try `lkw client doctor`', status: 2 })
+ */
+export function die(message: string, opts: { status?: number; hint?: string } = {}): never {
   console.error(`${symbols.error} ${message}`);
-  process.exit(status);
+  if (opts.hint) console.error(colors.dim(`  💡 ${opts.hint}`));
+  process.exit(opts.status ?? 1);
 }
 
 export function table(rows: Array<Record<string, unknown>>): void {
@@ -37,4 +46,28 @@ export function table(rows: Array<Record<string, unknown>>): void {
   // Native console.table works well enough for the typical CLI table sizes.
   // eslint-disable-next-line no-console
   console.table(rows);
+}
+
+/**
+ * Interactive yes/no confirmation. Returns true when the user confirms,
+ * false on cancel or "no". Bypassed if process.env.LKW_YES=true (CI).
+ *
+ * Use before destructive operations:
+ *   if (!(await confirm(`Delete workflow ${id}?`))) return;
+ */
+export async function confirm(message: string, defaultYes = false): Promise<boolean> {
+  if (process.env.LKW_YES === 'true') return true;
+  if (!process.stdin.isTTY) return defaultYes; // non-interactive (pipe) → use default
+  const r = await prompts({ type: 'confirm', name: 'ok', message, initial: defaultYes });
+  return r.ok === true;
+}
+
+/** Global verbose flag — set once from --verbose, read elsewhere. */
+let verboseMode = false;
+export function setVerbose(v: boolean) { verboseMode = v; }
+export function isVerbose(): boolean { return verboseMode || process.env.LKW_VERBOSE === 'true'; }
+
+/** Verbose-only log. Use to dump request/response, paths, decisions. */
+export function vlog(...args: unknown[]): void {
+  if (isVerbose()) console.error(colors.dim('[verbose]'), ...args);
 }
