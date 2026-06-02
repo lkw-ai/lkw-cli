@@ -1,6 +1,6 @@
 {
   "name": "@lkw-ai/cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Command-line interface for the LKW low-code workflow platform. Bootstrap clients, manage workflows, deploy bridges, and orchestrate operations from your terminal.",
   "license": "Apache-2.0",
   "type": "module",

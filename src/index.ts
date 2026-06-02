@@ -15,16 +15,26 @@ import { Command } from 'commander';
 
 import { loginCommand, logoutCommand, whoamiCommand } from './commands/auth/login.js';
 import { clientInitCommand } from './commands/client/init.js';
+import { clientDoctorCommand } from './commands/client/doctor.js';
+import { clientSwitchCommand } from './commands/client/switch.js';
 import { projectListCommand } from './commands/project/list.js';
 import { workflowListCommand } from './commands/workflow/list.js';
 import { workflowExportCommand } from './commands/workflow/export.js';
 import { workflowImportCommand } from './commands/workflow/import.js';
 import { workflowTriggerCommand } from './commands/workflow/trigger.js';
+import { workflowWatchCommand } from './commands/workflow/watch.js';
+import { workflowValidateCommand } from './commands/workflow/validate.js';
+import { workflowDiffCommand } from './commands/workflow/diff.js';
+import { workflowDevCommand } from './commands/workflow/dev.js';
+import { workflowLogsCommand } from './commands/workflow/logs.js';
+import { templateListCommand } from './commands/template/list.js';
+import { templateUseCommand } from './commands/template/use.js';
+import { mocksPingCommand } from './commands/mocks/ping.js';
 
 const program = new Command()
   .name('lkw')
   .description('Command-line interface for the LKW low-code workflow platform')
-  .version('0.1.0');
+  .version('0.2.0');
 
 const auth = new Command('auth').description('Authentication: login, logout, session info');
 auth.addCommand(loginCommand());
@@ -32,20 +42,36 @@ auth.addCommand(logoutCommand());
 program.addCommand(auth);
 program.addCommand(whoamiCommand()); // shortcut: `lkw whoami`
 
-const client = new Command('client').description('Client / organization lifecycle');
+const client = new Command('client').description('Client / organization + CLI profile lifecycle');
 client.addCommand(clientInitCommand());
+client.addCommand(clientDoctorCommand());
+client.addCommand(clientSwitchCommand());
 program.addCommand(client);
 
 const project = new Command('project').description('Projects');
 project.addCommand(projectListCommand());
 program.addCommand(project);
 
-const workflow = new Command('workflow').description('Workflow CRUD + execution + import/export');
+const workflow = new Command('workflow').description('Workflow authoring, execution, observability');
 workflow.addCommand(workflowListCommand());
 workflow.addCommand(workflowExportCommand());
 workflow.addCommand(workflowImportCommand());
 workflow.addCommand(workflowTriggerCommand());
+workflow.addCommand(workflowWatchCommand());
+workflow.addCommand(workflowValidateCommand());
+workflow.addCommand(workflowDiffCommand());
+workflow.addCommand(workflowDevCommand());
+workflow.addCommand(workflowLogsCommand());
 program.addCommand(workflow);
+
+const template = new Command('template').description('Workflow templates (catálogo + clone)');
+template.addCommand(templateListCommand());
+template.addCommand(templateUseCommand());
+program.addCommand(template);
+
+const mocks = new Command('mocks').description('Interact with the lkw-mocks service');
+mocks.addCommand(mocksPingCommand());
+program.addCommand(mocks);
 
 program.parseAsync(process.argv).catch((err) => {
   console.error(err);
