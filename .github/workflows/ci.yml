@@ -10,11 +10,45 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout CLI
+        uses: actions/checkout@v4
+        with:
+          path: lkw-cli
+
+      # The CLI depends on @lkw-ai/sdk. Until we publish it on npm,
+      # we resolve it locally by checking out the SDK as a sibling and
+      # swapping the package.json dependency to `file:../lkw-sdk` for CI.
+      # Once @lkw-ai/sdk is on the npm registry, drop this step and use
+      # the published version directly.
+      - name: Checkout SDK (sibling)
+        uses: actions/checkout@v4
+        with:
+          repository: lkw-ai/lkw-sdk
+          path: lkw-sdk
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build
-      - run: npm test --if-present
+
+      - name: Build SDK
+        working-directory: lkw-sdk
+        run: |
+          npm ci
+          npm run build
+
+      - name: Point CLI at local SDK
+        working-directory: lkw-cli
+        run: |
+          npm pkg set 'dependencies.@lkw-ai/sdk=file:../lkw-sdk'
+
+      - name: Install CLI
+        working-directory: lkw-cli
+        run: npm install --no-audit --no-fund
+
+      - name: Type-check & build
+        working-directory: lkw-cli
+        run: npm run build
+
+      - name: Test
+        working-directory: lkw-cli
+        run: npm test --if-present

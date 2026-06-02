@@ -3,7 +3,7 @@
  * ~/.lkw/config.json. Wires telemetry into the global verbose channel
  * so `lkw -v <cmd>` prints request/response for debugging.
  */
-import { LkwClient, LkwError } from '@lkw-ai/sdk';
+import { LkwClient, LkwError, type RequestTelemetry } from '@lkw-ai/sdk';
 import { getActiveProfile } from './config.js';
 import { vlog, isVerbose, colors } from './ui.js';
 
@@ -15,12 +15,12 @@ export function makeClient(): LkwClient {
     apiBaseUrl: profile.apiBaseUrl,
     bearerToken: profile.token,
     userAgent: `@lkw-ai/cli/${CLI_VERSION}`,
-    onRequest: (info) => {
+    onRequest: (info: RequestTelemetry) => {
       if (!isVerbose()) return;
       const status = info.error ? colors.error(`${info.status}`) : colors.success(`${info.status}`);
       const retry = info.retried ? colors.warn(` (attempt ${info.attempt}${info.retried ? ', retry' : ''})`) : '';
       vlog(`${info.method} ${info.url} → ${status} ${info.durationMs}ms${retry}`);
-      if (info.error) vlog(`  ${colors.error(info.error.toString())}`);
+      if (info.error) vlog(`  ${colors.error(String(info.error))}`);
     },
   });
 }
