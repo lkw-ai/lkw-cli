@@ -29,7 +29,7 @@ export function spinner(text: string): Ora {
 /**
  * Centralized exit. Optionally adds a helpful hint after the error.
  * Examples:
- *   die('CEP inválido', { hint: 'must be 8 digits' })
+ *   die('invalid CEP', { hint: 'must be 8 digits' })
  *   die('cannot reach API', { hint: 'try `lkw client doctor`', status: 2 })
  */
 export function die(message: string, opts: { status?: number; hint?: string } = {}): never {

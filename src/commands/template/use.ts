@@ -18,7 +18,7 @@ export function templateUseCommand(): Command {
         const lkw = makeClient();
         const tpl = await lkw.workflows.get(templateId);
         const created = await lkw.workflows.create(projectId, {
-          name: opts.name ?? `${tpl.name} (cópia)`,
+          name: opts.name ?? `${tpl.name} (copy)`,
           description: tpl.description,
           nodes: tpl.nodes,
           edges: tpl.edges,
