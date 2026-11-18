@@ -76,7 +76,7 @@ workflow.addCommand(workflowLogsCommand());
 workflow.addCommand(workflowDeleteCommand());
 program.addCommand(workflow);
 
-const template = new Command('template').description('Workflow templates (catálogo + clone)');
+const template = new Command('template').description('Workflow templates (catalog + clone)');
 template.addCommand(templateListCommand());
 template.addCommand(templateUseCommand());
 program.addCommand(template);
